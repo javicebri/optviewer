@@ -1,1 +1,1 @@
-web: panel serve --address="0.0.0.0" --port=$PORT optimizer_display_panel.py --allow-websocket-origin=optviewer.herokuapp.com
+web: panel serve --address="0.0.0.0" --port=$PORT optimizer_display_panel.py --allow-websocket-origin=optviewer-5b79a5e15d1f.herokuapp.com
