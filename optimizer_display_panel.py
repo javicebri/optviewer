@@ -145,6 +145,8 @@ class GraphApp:
         if self.selected_option == "Custom":
             self.custom_input_widget.visible = True
             self.check_function_button.visible = False
+        else:
+            self.custom_input_widget.visible = False
 
         self.lower_limit_input_widget.visible = True
         self.upper_limit_input_widget.visible = True

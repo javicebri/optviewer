@@ -1,4 +1,6 @@
 /.ipynb_checkpoints
+/venv
+/.idea
 /Leontief optimization.ipynb
 /Optimización no lineal.ipynb
 /Optimization_explorer.ipynb
