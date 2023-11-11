@@ -3,7 +3,7 @@ import holoviews as hv
 import pandas as pd
 import numpy as np
 from scipy.optimize import minimize
-from cerberus import Validator
+#from cerberus import Validator
 
 pn.extension()
 
