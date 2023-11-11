@@ -62,6 +62,8 @@ class GraphApp:
         seed = 42
         np.random.seed(seed)
 
+        self.read_limits()
+
         self.x0 = np.random.uniform(self.lower_limit,
                                     self.upper_limit)
         self.x = np.linspace(self.lower_limit,
