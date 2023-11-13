@@ -25,6 +25,8 @@ class GraphApp:
         self.select_fuction_widget.param.watch(self.select_function, "value")
         self.selected_option = None
 
+        self.imagen_pane = pn.panel("icon.png", width=60, height=60, align="center")
+
         # Text widgets
         self.text_title = pn.pane.Markdown("# Optimizer Viewer", style={'font-size': '16pt'})
         self.text_hint = pn.widgets.StaticText(name='Hint', value='')
@@ -36,8 +38,12 @@ class GraphApp:
         self.custom_input_widget = pn.widgets.TextInput(name='Custom function', visible=False)
         self.lower_limit_input_widget = pn.widgets.FloatInput(name='Lower limit', visible=False)
         self.upper_limit_input_widget = pn.widgets.FloatInput(name='Upper limit', visible=False)
+        self.init_point_input_widget = pn.widgets.FloatInput(name='Init point', visible=False)
         self.check_function_button = pn.widgets.Button(name="Validate", button_type="primary",
                                                        visible=False, align="center")
+
+        # Checkbox widgets
+        self.seed_checkbox = pn.widgets.Checkbox(name='As random seed', visible=False, align='end')
 
         # Button widgets
         self.check_function_button.on_click(self.check_function)
@@ -78,11 +84,15 @@ class GraphApp:
         :param event: Press Optimize button
         :return: None
         """
-        seed = 42
-        np.random.seed(seed)
         self.read_limits()
-        self.x0 = np.random.uniform(self.lower_limit,
-                                    self.upper_limit)
+
+        if self.seed_checkbox.value:
+            #seed = 42
+            np.random.seed(self.init_point_input_widget.value)
+            self.x0 = np.random.uniform(self.lower_limit,
+                                        self.upper_limit)
+        else:
+            self.x0 = self.init_point_input_widget.value
         self.x = np.linspace(self.lower_limit,
                              self.upper_limit,
                              1000)
@@ -122,8 +132,10 @@ class GraphApp:
             iteration_list.append(np.array([x[0], function_value[0]]))
 
         # apply function
-        self.text_hint.value = self.method_expression
-        result = eval(self.method_expression)
+        try:
+            result = eval(self.method_expression)
+        except Exception as error:
+            self.text_hint.value = "Sorry, currently it is under development, please choose another method"
 
         self.evaluation_arr = np.vstack(evaluation_list)
         self.iteration_arr = np.vstack(iteration_list)
@@ -195,8 +207,7 @@ class GraphApp:
         :return: None
         """
         self.selected_option = event.obj.value
-        self.text_hint.value = "Selected function is " + self.selected_option + \
-                               ". Now fix the limits."
+        self.text_hint.value = "Selected function is " + self.selected_option
 
         if self.selected_option == "Custom":
             self.custom_input_widget.visible = True
@@ -207,6 +218,8 @@ class GraphApp:
 
         self.lower_limit_input_widget.visible = True
         self.upper_limit_input_widget.visible = True
+        self.init_point_input_widget.visible = True
+        self.seed_checkbox.visible = True
         self.optimize_button.visible = True
 
     def advance_plot(self, event):
@@ -252,7 +265,7 @@ class GraphApp:
 
     def view(self):
         return pn.Column(
-            self.text_title,
+            pn.Row(self.text_title, self.imagen_pane),
             pn.Row(
                 pn.Column(self.select_fuction_widget,
                           self.select_method_widget,
@@ -260,6 +273,8 @@ class GraphApp:
                                  self.check_function_button),
                           self.lower_limit_input_widget,
                           self.upper_limit_input_widget,
+                          pn.Row(self.init_point_input_widget,
+                                 self.seed_checkbox),
                           self.optimize_button,
                           self.text_hint
                           ),
