@@ -1,1 +1,1 @@
-web: panel serve --address="0.0.0.0" --port=$PORT main.py --allow-websocket-origin=optviewer-javicebri.herokuapp.com
+web: panel serve --address="0.0.0.0" --port=$PORT main.py --allow-websocket-origin=https://optviewer-5b79a5e15d1f.herokuapp.com
