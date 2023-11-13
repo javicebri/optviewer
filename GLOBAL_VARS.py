@@ -27,5 +27,18 @@ methods_options_dict = {
                 "tol": ["float", None],
                 #"disp": ["bool", False],
                 "maxiter": ["int", None],
-                "catol": ["float", None]}
+                "catol": ["float", None]},
+    "Nelder-Mead": {},
+    "Powell": {},
+    "CG": {},
+    "BFGS": {},
+    "Newton-CG": {},
+    "CG": {},
+    "L-BFGS-B": {},
+    "TNC": {},
+    "trust-constr": {},
+    "dogleg": {},
+    "trust-ncg": {},
+    "trust-exact": {},
+    "trust-krylov": {}
 }
