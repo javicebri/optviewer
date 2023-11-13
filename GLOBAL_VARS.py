@@ -1,5 +1,4 @@
 
-
 # Preset functions
 functions_dict = {"Quadratic": "x**2",
                   "Mixed": "(np.sin(1/2 * x) + 2 * np.cos(1/2 * x)) * x**2"
