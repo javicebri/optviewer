@@ -2,6 +2,7 @@ import panel as pn
 import holoviews as hv
 import pandas as pd
 import numpy as np
+import GLOBAL_VARS as gv
 from scipy.optimize import minimize
 #from cerberus import Validator
 
@@ -10,28 +11,31 @@ pn.extension()
 
 class GraphApp:
     def __init__(self):
-        self.index = 0  # Índice para el gráfico
+        self.index = 0  # Graph index
         self.plot_pane = pn.pane.HoloViews()
 
-        self.functions_dict = {'Cuadratic': 'x**2',
-                               'Mixed': '(np.sin(1/2 * x) + 2 * np.cos(1/2 * x)) * x**2'}
-        possible_functions_list = list(self.functions_dict.keys()) + ["Custom"]
+        # Available functions in the selector
+        possible_functions_list = list(gv.functions_dict.keys()) + ["Custom"]
         self.select_widget = pn.widgets.Select(options=possible_functions_list,
                                                name='Function')
         self.select_widget.param.watch(self.select_function, "value")
         self.selected_option = None
 
+        # Text widgets
         self.text_title = pn.pane.Markdown("# Optimizer Viewer", style={'font-size': '16pt'})
-        self.text_widget = pn.widgets.StaticText(name='Hint', value='')
-        self.text_widget.value = "Select the function."
+        self.text_hint = pn.widgets.StaticText(name='Hint', value='')
+        self.text_hint.value = "Select the function."
         self.text_index = pn.widgets.StaticText(value='', visible=False)
         self.text_index.value = str(self.index)
 
+        # Input widgets
         self.custom_input_widget = pn.widgets.TextInput(name='Custom function', visible=False)
         self.lower_limit_input_widget = pn.widgets.FloatInput(name='Lower limit', visible=False)
         self.upper_limit_input_widget = pn.widgets.FloatInput(name='Upper limit', visible=False)
         self.check_function_button = pn.widgets.Button(name="Validate", button_type="primary",
                                                        visible=False, align="center")
+
+        # Button widgets
         self.check_function_button.on_click(self.check_function)
         self.optimize_button = pn.widgets.Button(name="Optimize", button_type="primary", visible=False)
         self.optimize_button.on_click(self.start_optimization)
@@ -40,6 +44,7 @@ class GraphApp:
         self.backward_button = pn.widgets.Button(name="< Backward", button_type="primary", visible=False)
         self.backward_button.on_click(self.backward_plot)
 
+        # Vars
         self.x = None
         self.x0 = None
         self.y = None
@@ -52,18 +57,25 @@ class GraphApp:
         self.function_expression = None
 
     def read_limits(self):
+        """
+        Read limit input widgets and set values
+        :return: None
+        """
         self.lower_limit = self.lower_limit_input_widget.value
         self.upper_limit = self.upper_limit_input_widget.value
 
         if self.lower_limit == self.upper_limit:
-            self.text_widget.value = "Limits must have different values."
+            self.text_hint.value = "Limits must have different values."
 
     def start_optimization(self, event):
+        """
+        Calculate optimization
+        :param event: Press Optimize button
+        :return: None
+        """
         seed = 42
         np.random.seed(seed)
-
         self.read_limits()
-
         self.x0 = np.random.uniform(self.lower_limit,
                                     self.upper_limit)
         self.x = np.linspace(self.lower_limit,
@@ -74,7 +86,7 @@ class GraphApp:
             self.function_expression = self.custom_input_widget.value
             self.check_function()
         else:
-            self.function_expression = self.functions_dict[self.selected_option]
+            self.function_expression = gv.functions_dict[self.selected_option]
 
         x = self.x  # eval expression needs x value
         self.y = eval(self.function_expression)
@@ -86,12 +98,21 @@ class GraphApp:
         iteration_list = []
 
         def objetive_function(x):
+            """
+            Function to be optimized
+            :param x: float to be evaluated
+            :return: float f(x)
+            """
             eval_result = self.evaluate_function(x)
             evaluation_list.append(np.array([x[0], eval_result[0]]))
             return eval_result
 
-        # callback funtion to save each iteration retsult: x value and function value
         def iteration_call(x):
+            """
+            Callback funtion to save each iteration result
+            :param x: result of optimization
+            :return: x value and function value
+            """
             function_value = self.evaluate_function(x)
             iteration_list.append(np.array([x[0], function_value[0]]))
 
@@ -114,7 +135,6 @@ class GraphApp:
         self.max_index = evaluation_df.shape[0]
         self.index = evaluation_df.shape[0]
 
-
         scatter = hv.Scatter(evaluation_df).opts(color=hv.dim('color').categorize({'blue': 'blue',
                                                                                    'red': 'red'}),
                                                  title='Optimization Iteration Nº={}'.format(self.max_index))
@@ -123,25 +143,43 @@ class GraphApp:
         self.text_index.visible = True
         self.backward_button.visible = True
         self.advance_button.visible = True
-        self.text_widget.value = "Optimization done"
+        self.text_hint.value = "Optimization done"
 
     def evaluate_function(self, x):
+        """
+        y = f(x)
+        :param x: float
+        :return: float y = f(x)
+        """
         return eval(self.function_expression)
 
     def plot_function(self):
+        """
+        Holoviz plot y=f(x)
+        :return: hv plot object
+        """
         curve = hv.Curve((self.x, self.y)).opts(width=500, height=300)
         return curve
 
     def check_function(self):
+        """
+        Validate function str
+        :return: None
+        """
         x = np.array([0, 1, 2])
         try:
             eval(self.function_expression)
         except Exception as error:
-            self.text_widget.value = error
+            self.text_hint.value = error
 
     def select_function(self, event):
+        """
+        Set selected function
+        :param event: click selection in function scroll
+        :return: None
+        """
         self.selected_option = event.obj.value
-        self.text_widget.value = "Selected function is " + self.selected_option +\
+        self.text_hint.value = "Selected function is " + self.selected_option +\
                                  ". Now fix the limits."
 
         if self.selected_option == "Custom":
@@ -156,20 +194,34 @@ class GraphApp:
         self.optimize_button.visible = True
 
     def advance_plot(self, event):
+        """
+        Plot next point
+        :param event: Click on Advance button
+        :return: None
+        """
         if self.index < self.max_index:
             self.index += 1
-            self.text_widget.value = "Advance done"
+            self.text_hint.value = "Advance done"
         self.text_index.value = str(self.index)
         self.update_plot()
 
     def backward_plot(self, event):
+        """
+        Plot previous point
+        :param event: Click on Backward button
+        :return: None
+        """
         if self.index > 0:
             self.index -= 1
-            self.text_widget.value = "Backward done"
+            self.text_hint.value = "Backward done"
         self.text_index.value = str(self.index)
         self.update_plot()
 
     def update_plot(self):
+        """
+        Plot with new points (after advance or backward)
+        :return: None
+        """
         evaluation_df = pd.DataFrame({
             'x': self.evaluation_arr[:self.index, 0],
             'y': self.evaluation_arr[:self.index, 1],
@@ -192,7 +244,7 @@ class GraphApp:
                           self.lower_limit_input_widget,
                           self.upper_limit_input_widget,
                           self.optimize_button,
-                          self.text_widget
+                          self.text_hint
                           ),
                 pn.Column(self.plot_pane,
                           pn.Row(self.backward_button,

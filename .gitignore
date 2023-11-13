@@ -1,8 +1,6 @@
 /.ipynb_checkpoints
 /venv
 /.idea
-/Leontief optimization.ipynb
-/Optimización no lineal.ipynb
-/Optimization_explorer.ipynb
-/Optimization_explorer_panel.ipynb
-/Programación_lineal.ipynb
+/instrucciones.txt
+/Procfile
+/run.py

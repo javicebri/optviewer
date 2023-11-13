@@ -2,7 +2,7 @@ import subprocess
 import webbrowser
 
 # Directorio donde se encuentra el archivo optimizer_display_panel.py
-working_directory = "C:\\Users\\jc_ce\\Desktop\\01Proyectos\\hermes\\cuadernos\\"
+working_directory = "C:\\Users\\jc_ce\\Desktop\\01Proyectos\\optviewer\\"
 
 # Comando para iniciar la aplicación de Bokeh
 command = f"bokeh serve {working_directory}optimizer_display_panel.py --show"
