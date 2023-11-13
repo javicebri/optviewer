@@ -14,11 +14,14 @@ class GraphApp:
         self.index = 0  # Graph index
         self.plot_pane = pn.pane.HoloViews()
 
-        # Available functions in the selector
+        # Selector widgets
+        self.select_method_widget = pn.widgets.Select(options=list(gv.methods_options_dict.keys()),
+                                                      name='Method')
+        self.select_method_widget.param.watch(self.select_method, "value")
         possible_functions_list = list(gv.functions_dict.keys()) + ["Custom"]
-        self.select_widget = pn.widgets.Select(options=possible_functions_list,
-                                               name='Function')
-        self.select_widget.param.watch(self.select_function, "value")
+        self.select_fuction_widget = pn.widgets.Select(options=possible_functions_list,
+                                                       name='Function')
+        self.select_fuction_widget.param.watch(self.select_fuction_widget, "value")
         self.selected_option = None
 
         # Text widgets
@@ -172,6 +175,8 @@ class GraphApp:
         except Exception as error:
             self.text_hint.value = error
 
+    def select_method(self):
+        pass
     def select_function(self, event):
         """
         Set selected function
@@ -238,7 +243,8 @@ class GraphApp:
         return pn.Column(
             self.text_title,
             pn.Row(
-                pn.Column(self.select_widget,
+                pn.Column(self.select_method_widget,
+                          self.select_fuction_widget,
                           pn.Row(self.custom_input_widget,
                                  self.check_function_button),
                           self.lower_limit_input_widget,
