@@ -4,7 +4,8 @@ import pandas as pd
 import numpy as np
 import GLOBAL_VARS as gv
 from scipy.optimize import minimize
-#from cerberus import Validator
+
+# from cerberus import Validator
 
 pn.extension()
 
@@ -17,17 +18,17 @@ class GraphApp:
         # Selector widgets
         self.select_method_widget = pn.widgets.Select(options=list(gv.methods_options_dict.keys()),
                                                       name='Method')
-        self.select_method_widget.param.watch(self.select_method, "value")
+        self.select_method_widget.param.watch(self.set_method, "value")
         possible_functions_list = list(gv.functions_dict.keys()) + ["Custom"]
         self.select_fuction_widget = pn.widgets.Select(options=possible_functions_list,
                                                        name='Function')
-        self.select_fuction_widget.param.watch(self.select_fuction_widget, "value")
+        self.select_fuction_widget.param.watch(self.select_function, "value")
         self.selected_option = None
 
         # Text widgets
         self.text_title = pn.pane.Markdown("# Optimizer Viewer", style={'font-size': '16pt'})
         self.text_hint = pn.widgets.StaticText(name='Hint', value='')
-        self.text_hint.value = "Select the function."
+        self.text_hint.value = "Select the function and the method."
         self.text_index = pn.widgets.StaticText(value='', visible=False)
         self.text_index.value = str(self.index)
 
@@ -58,6 +59,7 @@ class GraphApp:
         self.iteration_arr = None
         self.evaluation_arr = None
         self.function_expression = None
+        self.method_expression = None
 
     def read_limits(self):
         """
@@ -120,11 +122,8 @@ class GraphApp:
             iteration_list.append(np.array([x[0], function_value[0]]))
 
         # apply function
-        result = minimize(objetive_function, self.x0,
-                          method='slsqp',
-                          bounds=[(self.lower_limit, self.upper_limit)],
-                          options={'disp': True},
-                          callback=iteration_call)
+        self.text_hint.value = self.method_expression
+        result = eval(self.method_expression)
 
         self.evaluation_arr = np.vstack(evaluation_list)
         self.iteration_arr = np.vstack(iteration_list)
@@ -175,8 +174,20 @@ class GraphApp:
         except Exception as error:
             self.text_hint.value = error
 
-    def select_method(self):
-        pass
+    def set_method(self, event):
+        """
+        Build optimization expression
+        :param event: click selection in method scroll
+        :return: None
+        """
+        self.method_expression = "minimize(objetive_function, self.x0," + \
+                                 "method='" + event.obj.value + "'," +\
+                                 "bounds=[(self.lower_limit, self.upper_limit)]," + \
+                                 "options={'disp': True}," + \
+                                 "callback=iteration_call)"
+        self.text_hint.value = "Selected method is " + event.obj.value
+
+
     def select_function(self, event):
         """
         Set selected function
@@ -184,8 +195,8 @@ class GraphApp:
         :return: None
         """
         self.selected_option = event.obj.value
-        self.text_hint.value = "Selected function is " + self.selected_option +\
-                                 ". Now fix the limits."
+        self.text_hint.value = "Selected function is " + self.selected_option + \
+                               ". Now fix the limits."
 
         if self.selected_option == "Custom":
             self.custom_input_widget.visible = True
@@ -243,8 +254,8 @@ class GraphApp:
         return pn.Column(
             self.text_title,
             pn.Row(
-                pn.Column(self.select_method_widget,
-                          self.select_fuction_widget,
+                pn.Column(self.select_fuction_widget,
+                          self.select_method_widget,
                           pn.Row(self.custom_input_widget,
                                  self.check_function_button),
                           self.lower_limit_input_widget,
