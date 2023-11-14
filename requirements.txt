@@ -3,3 +3,4 @@ holoviews
 pandas
 numpy
 scipy
+flask
