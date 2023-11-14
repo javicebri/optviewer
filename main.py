@@ -240,7 +240,7 @@ class GraphApp:
         :param event: Click on Backward button
         :return: None
         """
-        if self.index > 0:
+        if self.index > 1:
             self.index -= 1
             self.text_hint.value = "Backward done"
         self.text_index.value = str(self.index)
