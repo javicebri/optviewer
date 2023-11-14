@@ -268,9 +268,9 @@ class GraphApp:
             pn.Row(self.text_title, self.imagen_pane),
             pn.Row(
                 pn.Column(self.select_fuction_widget,
-                          self.select_method_widget,
                           pn.Row(self.custom_input_widget,
                                  self.check_function_button),
+                          self.select_method_widget,
                           self.lower_limit_input_widget,
                           self.upper_limit_input_widget,
                           pn.Row(self.init_point_input_widget,
