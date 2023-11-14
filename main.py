@@ -199,7 +199,6 @@ class GraphApp:
                                  "callback=iteration_call)"
         self.text_hint.value = "Selected method is " + event.obj.value
 
-
     def select_function(self, event):
         """
         Set selected function
