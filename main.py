@@ -178,7 +178,7 @@ class GraphApp:
         Holoviz plot y=f(x)
         :return: hv plot object
         """
-        curve = hv.Curve((self.x, self.y)).opts(width=500, height=300)
+        curve = hv.Curve((self.x, self.y)).opts(tools=['hover'], width=500, height=300)
         return curve
 
     def check_function(self):
