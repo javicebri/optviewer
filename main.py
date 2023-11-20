@@ -26,7 +26,6 @@ class GraphApp:
                                                        value=possible_functions_list[0],
                                                        name='Function')
         self.select_fuction_widget.param.watch(self.select_function, "value")
-        self.selected_option = None
 
         self.imagen_pane = pn.panel("icon.png", width=60, height=60, align="center")
 
@@ -39,18 +38,18 @@ class GraphApp:
 
         # Input widgets
         self.custom_input_widget = pn.widgets.TextInput(name='Custom function', visible=False)
-        self.lower_limit_input_widget = pn.widgets.FloatInput(name='Lower limit', visible=False)
-        self.upper_limit_input_widget = pn.widgets.FloatInput(name='Upper limit', visible=False)
-        self.init_point_input_widget = pn.widgets.FloatInput(name='Init point', visible=False)
+        self.lower_limit_input_widget = pn.widgets.FloatInput(name='Lower limit', visible=True)
+        self.upper_limit_input_widget = pn.widgets.FloatInput(name='Upper limit', visible=True)
+        self.init_point_input_widget = pn.widgets.FloatInput(name='Init point', visible=True)
         self.check_function_button = pn.widgets.Button(name="Validate", button_type="primary",
                                                        visible=False, align="center")
 
         # Checkbox widgets
-        self.seed_checkbox = pn.widgets.Checkbox(name='As random seed', visible=False, align='end')
+        self.seed_checkbox = pn.widgets.Checkbox(name='As random seed', visible=True, align='end')
 
         # Button widgets
         self.check_function_button.on_click(self.check_function)
-        self.optimize_button = pn.widgets.Button(name="Optimize", button_type="primary", visible=False)
+        self.optimize_button = pn.widgets.Button(name="Optimize", button_type="primary", visible=True)
         self.optimize_button.on_click(self.start_optimization)
         self.advance_button = pn.widgets.Button(name="Advance >", button_type="primary", visible=False)
         self.advance_button.on_click(self.advance_plot)
@@ -67,8 +66,10 @@ class GraphApp:
         self.upper_limit = None
         self.iteration_arr = None
         self.evaluation_arr = None
-        self.function_expression = None
         self.method_expression = None
+        self.set_method(self.select_method_widget.value)
+        self.selected_option = self.select_fuction_widget.value
+        self.function_expression = gv.functions_dict[self.selected_option]
 
     def read_limits(self):
         """
@@ -195,12 +196,16 @@ class GraphApp:
         :param event: click selection in method scroll
         :return: None
         """
+        if isinstance(event, str):
+            value = event
+        else:
+            value = event.obj.value
         self.method_expression = "minimize(objetive_function, self.x0," + \
-                                 "method='" + event.obj.value + "'," +\
+                                 "method='" + value + "'," +\
                                  "bounds=[(self.lower_limit, self.upper_limit)]," + \
                                  "options={'disp': True}," + \
                                  "callback=iteration_call)"
-        self.text_hint.value = "Selected method is " + event.obj.value
+        self.text_hint.value = "Selected method is " + str(type(event))
 
     def select_function(self, event):
         """
