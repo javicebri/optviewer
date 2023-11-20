@@ -30,7 +30,7 @@ class GraphApp:
         self.imagen_pane = pn.panel("icon.png", width=60, height=60, align="center")
 
         # Text widgets
-        self.text_title = pn.pane.Markdown("# Optimizer Viewer", style={'font-size': '16pt'})
+        self.text_title = pn.pane.Markdown("# Optimizer Viewer", styles={'font-size': '16pt'})
         self.text_hint = pn.widgets.StaticText(name='Hint', value='')
         self.text_hint.value = "Select the function and the method."
         self.text_index = pn.widgets.StaticText(value='', visible=False)
@@ -81,6 +81,8 @@ class GraphApp:
 
         if self.lower_limit == self.upper_limit:
             self.text_hint.value = "Limits must have different values."
+        elif self.lower_limit > self.upper_limit:
+            self.text_hint.value = "The lower limit must be lower than the upper limit."
 
     def start_optimization(self, event):
         """
@@ -205,8 +207,7 @@ class GraphApp:
                                  "bounds=[(self.lower_limit, self.upper_limit)]," + \
                                  "options={'disp': True}," + \
                                  "callback=iteration_call)"
-        self.text_hint.value = "Selected method is " + str(type(event))
-
+        self.text_hint.value = "Selected method is " + value
     def select_function(self, event):
         """
         Set selected function
