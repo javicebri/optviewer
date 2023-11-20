@@ -16,11 +16,14 @@ class GraphApp:
         self.plot_pane = pn.pane.HoloViews()
 
         # Selector widgets
-        self.select_method_widget = pn.widgets.Select(options=list(gv.methods_options_dict.keys()),
+        possible_method_list = list(gv.methods_options_dict.keys())
+        self.select_method_widget = pn.widgets.Select(options=possible_method_list,
+                                                      value=possible_method_list[0],
                                                       name='Method')
         self.select_method_widget.param.watch(self.set_method, "value")
         possible_functions_list = list(gv.functions_dict.keys()) + ["Custom"]
         self.select_fuction_widget = pn.widgets.Select(options=possible_functions_list,
+                                                       value=possible_functions_list[0],
                                                        name='Function')
         self.select_fuction_widget.param.watch(self.select_function, "value")
         self.selected_option = None
@@ -88,7 +91,7 @@ class GraphApp:
 
         if self.seed_checkbox.value:
             #seed = 42
-            np.random.seed(self.init_point_input_widget.value)
+            np.random.seed(abs(self.init_point_input_widget.value))
             self.x0 = np.random.uniform(self.lower_limit,
                                         self.upper_limit)
         else:
